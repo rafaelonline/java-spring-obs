@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-forum-api
+  labels:
+    app: app-forum-api
+spec:
+  template:
+    metadata:
+      name: app-forum-api
+      labels:
+        app: app-forum-api
+    spec:
+      containers:
+        - name: app-forum-api
+          image: rconceicaobr/forum-api:0.2
+          ports:
+            - containerPort: 8080
+          resources: 
+            requests:
+              cpu: "10m"
+              memory: "128M"
+            limits:
+              cpu: "400m"
+              memory: "512M"
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: app-forum-api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-forum-api-svc
+  labels:
+    app: app-forum-api
+    service: app-forum-api-svc
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+  selector:
+    app: app-forum-api
